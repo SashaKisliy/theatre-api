@@ -1,23 +1,20 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import action
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from rest_framework import viewsets, mixins
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from theatre.models import Genre, Actor, TheatreHall, Ticket, Reservation, Play, Performance
+from theatre.models import Genre, Actor, TheatreHall, Reservation, Play, Performance
 from theatre.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 from theatre.serializers import (
     GenreSerializer,
     ActorSerializer,
     TheatreHallSerializer,
-    TicketSerializer,
-    TicketSeatsSerializer,
-    TicketListSerializer,
     ReservationSerializer,
     ReservationListSerializer,
     PlaySerializer,
@@ -77,7 +74,7 @@ class PlayViewSet(mixins.ListModelMixin,
 
         if genres:
             genres_ids = self._params_to_ints(genres)
-            queryset = queryset.filter(genres_id__in=genres_ids)
+            queryset = queryset.filter(genres__id__in=genres_ids)
 
         if actors:
             actors_ids = self._params_to_ints(actors)
@@ -93,6 +90,28 @@ class PlayViewSet(mixins.ListModelMixin,
             return PlayDetailSerializer
 
         return PlaySerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "genres",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by genre id (ex. ?genres=2,5)",
+            ),
+            OpenApiParameter(
+                "actors",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by actor id (ex. ?actors=2,5)",
+            ),
+            OpenApiParameter(
+                "title",
+                type=OpenApiTypes.STR,
+                description="Filter by movie title (ex. ?title=fiction)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
@@ -133,6 +152,26 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
         return PerformanceSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "play",
+                type=OpenApiTypes.INT,
+                description="Filter by play id (ex. ?play=2)",
+            ),
+            OpenApiParameter(
+                "date",
+                type=OpenApiTypes.DATE,
+                description=(
+                    "Filter by datetime of Performance "
+                    "(ex. ?date=2022-10-23)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ReservationPagination(PageNumberPagination):
     page_size = 10
@@ -147,7 +186,7 @@ class ReservationViewSet(mixins.ListModelMixin,
     )
     serializer_class = ReservationSerializer
     pagination_class = ReservationPagination
-    permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
