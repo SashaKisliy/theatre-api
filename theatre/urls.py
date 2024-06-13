@@ -7,17 +7,17 @@ from theatre.views import (
     TheatreHallViewSet,
     PlayViewSet,
     PerformanceViewSet,
-    ReservationViewSet
+    ReservationViewSet,
 )
 
 router = routers.DefaultRouter()
-router.register('genres', GenreViewSet)
-router.register('actors', ActorViewSet)
-router.register('theatres', TheatreHallViewSet)
-router.register('performances', PerformanceViewSet)
-router.register('plays', PlayViewSet)
-router.register('reservations', ReservationViewSet)
+router.register("genres", GenreViewSet)
+router.register("actors", ActorViewSet)
+router.register("theatres", TheatreHallViewSet)
+router.register("performances", PerformanceViewSet)
+router.register("plays", PlayViewSet)
+router.register("reservations", ReservationViewSet)
 
-urlpatterns = [path('', include(router.urls))]
+urlpatterns = [path("", include(router.urls))]
 
-app_name = 'theatre'
+app_name = "theatre"

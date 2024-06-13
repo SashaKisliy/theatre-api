@@ -8,7 +8,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
-from theatre.models import Genre, Actor, TheatreHall, Reservation, Play, Performance
+from theatre.models import (
+    Genre,
+    Actor,
+    TheatreHall,
+    Reservation,
+    Play,
+    Performance
+)
 from theatre.permissions import IsAdminOrIfAuthenticatedReadOnly
 
 from theatre.serializers import (
@@ -26,34 +33,40 @@ from theatre.serializers import (
 )
 
 
-class GenreViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   GenericViewSet):
+class GenreViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
 
-class ActorViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   GenericViewSet):
+class ActorViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
 
-class TheatreHallViewSet(mixins.ListModelMixin,
-                         mixins.CreateModelMixin,
-                         GenericViewSet):
+class TheatreHallViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet
+):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
 
 
-class PlayViewSet(mixins.ListModelMixin,
-                  mixins.CreateModelMixin,
-                  mixins.RetrieveModelMixin,
-                  GenericViewSet):
+class PlayViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet,
+):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
     permission_classes = [IsAdminOrIfAuthenticatedReadOnly]
@@ -178,9 +191,9 @@ class ReservationPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class ReservationViewSet(mixins.ListModelMixin,
-                         mixins.CreateModelMixin,
-                         GenericViewSet):
+class ReservationViewSet(
+    mixins.ListModelMixin, mixins.CreateModelMixin, GenericViewSet
+):
     queryset = Reservation.objects.prefetch_related(
         "tickets__performance__play", "tickets__performance__theatre_hall"
     )
@@ -199,4 +212,3 @@ class ReservationViewSet(mixins.ListModelMixin,
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-

@@ -34,13 +34,7 @@ class TheatreHallSerializer(serializers.ModelSerializer):
 class PlaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Play
-        fields = (
-            "id",
-            "title",
-            "description",
-            "genres",
-            "actors"
-        )
+        fields = ("id", "title", "description", "genres", "actors")
 
 
 class PlayListSerializer(PlaySerializer):
@@ -62,13 +56,7 @@ class PlayDetailSerializer(PlaySerializer):
 
     class Meta:
         model = Play
-        fields = (
-            "id",
-            "title",
-            "description",
-            "genres",
-            "actors"
-        )
+        fields = ("id", "title", "description", "genres", "actors")
 
 
 class PerformanceSerializer(serializers.ModelSerializer):
@@ -95,7 +83,7 @@ class PerformanceListSerializer(PerformanceSerializer):
             "play_title",
             "theatre_hall_name",
             "theatre_hall_capacity",
-            "tickets_available"
+            "tickets_available",
         )
 
 
@@ -106,7 +94,7 @@ class TicketSerializer(serializers.ModelSerializer):
             attrs["row"],
             attrs["seat"],
             attrs["performance"].theatre_hall,
-            ValidationError
+            ValidationError,
         )
         return data
 
@@ -155,8 +143,3 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 class ReservationListSerializer(ReservationSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
-
-
-
-
-

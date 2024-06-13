@@ -38,23 +38,27 @@ class Actor(models.Model):
 class Play(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    genres = models.ManyToManyField(Genre, blank=True, related_name='plays')
-    actors = models.ManyToManyField(Actor, blank=True, related_name='plays')
+    genres = models.ManyToManyField(Genre, blank=True, related_name="plays")
+    actors = models.ManyToManyField(Actor, blank=True, related_name="plays")
 
     class Meta:
-        ordering = ['title']
+        ordering = ["title"]
 
     def __str__(self):
         return self.title
 
 
 class Performance(models.Model):
-    play = models.ForeignKey(Play, on_delete=models.CASCADE, related_name='performances')
-    theatre_hall = models.ForeignKey(TheatreHall, on_delete=models.CASCADE, related_name='performances')
+    play = models.ForeignKey(
+        Play, on_delete=models.CASCADE, related_name="performances"
+    )
+    theatre_hall = models.ForeignKey(
+        TheatreHall, on_delete=models.CASCADE, related_name="performances"
+    )
     show_time = models.DateTimeField()
 
     class Meta:
-        ordering = ['-show_time']
+        ordering = ["-show_time"]
 
     def __str__(self):
         return self.play.title + " " + str(self.show_time)
@@ -70,14 +74,18 @@ class Reservation(models.Model):
         return str(self.created_at)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
 
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name='tickets')
-    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='tickets')
+    performance = models.ForeignKey(
+        Performance, on_delete=models.CASCADE, related_name="tickets"
+    )
+    reservation = models.ForeignKey(
+        Reservation, on_delete=models.CASCADE, related_name="tickets"
+    )
 
     @staticmethod
     def validate_ticket(row, seat, theatre_hall, error_to_raise):
@@ -117,12 +125,8 @@ class Ticket(models.Model):
         )
 
     def __str__(self):
-        return (
-            f"{str(self.performance)} (row: {self.row}, seat: {self.seat})"
-        )
+        return f"{str(self.performance)} (row: {self.row}, seat: {self.seat})"
 
     class Meta:
         unique_together = ("performance", "row", "seat")
         ordering = ["row", "seat"]
-
-
